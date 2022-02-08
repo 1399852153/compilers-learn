@@ -1,4 +1,4 @@
-package chapter2.v3;
+package chapter2.v3.component;
 
 import java.util.ArrayList;
 import java.util.List;

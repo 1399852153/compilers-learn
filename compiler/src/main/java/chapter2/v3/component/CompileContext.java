@@ -1,4 +1,4 @@
-package chapter2.v3;
+package chapter2.v3.component;
 
 /**
  * @author xiongyx
