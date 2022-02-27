@@ -22,6 +22,41 @@ public class LexicalAnalyzer {
             {ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT}, // "空白符（制表符、空格、换行"
         };
 
+    private static char[] sourceCode = "".toCharArray();
+    private static int currentIndex = 0;
 
+    private static int currentState = 0;
 
+    public String getToken(){
+        StringBuilder tokenValue = new StringBuilder();
+
+        while(true){
+            char ch = getNextChar();
+            ACTION_ENUM action = getAction(ch);
+
+            currentState = STATE_TABLE[action.getCode()][currentState];
+            if(currentState == ERROR){
+                // todo 识别换行符，增加报错行数的信息
+                throw new RuntimeException("un expect char index=" + currentIndex);
+            }
+
+            currentIndex++;
+            tokenValue.append(ch);
+
+            if(currentState == ACCEPT){
+                // todo 类型、关键字过滤
+                return tokenValue.toString();
+            }
+        }
+
+    }
+
+    private static char getNextChar(){
+        return sourceCode[currentIndex];
+    }
+
+    private static ACTION_ENUM getAction(char ch) {
+        // todo 根据字符决定动作
+        return ACTION_ENUM.BLANK;
+    }
 }
