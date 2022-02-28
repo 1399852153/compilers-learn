@@ -1,5 +1,8 @@
 package lexan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LexicalAnalyzer {
 
     private static final int ACCEPT = -1;
@@ -22,15 +25,37 @@ public class LexicalAnalyzer {
             {ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT,ACCEPT}, // "空白符（制表符、空格、换行"
         };
 
-    private static char[] sourceCode = "".toCharArray();
-    private static int currentIndex = 0;
+    private char[] sourceCode;
+    private int currentIndex = 0;
 
-    private static int currentState = 0;
+    private int currentState = 0;
+
+    public LexicalAnalyzer(String sourceCode) {
+        this.sourceCode = sourceCode.toCharArray();
+    }
+
+    public static void main(String[] args) {
+        String sourceCode = "pu";
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
+        List<String> tokenList = lexicalAnalyzer.parseToken();
+        System.out.println(tokenList);
+    }
+
+    public List<String> parseToken(){
+        List<String> tokenList = new ArrayList<>();
+        while(canParseNext()){
+            String token = getToken();
+            System.out.println(token);
+            tokenList.add(token);
+        }
+
+        return tokenList;
+    }
 
     public String getToken(){
         StringBuilder tokenValue = new StringBuilder();
 
-        while(true){
+        while(canParseNext()){
             char ch = getNextChar();
             ACTION_ENUM action = getAction(ch);
 
@@ -41,22 +66,69 @@ public class LexicalAnalyzer {
             }
 
             currentIndex++;
-            tokenValue.append(ch);
 
             if(currentState == ACCEPT){
+                // 接收一个token后，当前状态机state重置
+                currentState = 0;
                 // todo 类型、关键字过滤
                 return tokenValue.toString();
             }
+
+            tokenValue.append(ch);
         }
 
+        throw new RuntimeException("not in here");
     }
 
-    private static char getNextChar(){
+    private boolean canParseNext(){
+        return currentIndex < sourceCode.length;
+    }
+
+    private char getNextChar(){
         return sourceCode[currentIndex];
     }
 
     private static ACTION_ENUM getAction(char ch) {
-        // todo 根据字符决定动作
-        return ACTION_ENUM.BLANK;
+        if(Character.isDigit(ch)){
+            return ACTION_ENUM.DIGITAL;
+        }
+
+        if(Character.isLetter(ch)){
+            return ACTION_ENUM.LETTER;
+        }
+
+        if(ch == '+'){
+            return ACTION_ENUM.PLUS;
+        }
+
+        if(ch == '-'){
+            return ACTION_ENUM.MINUS;
+        }
+
+        if(ch == '>'){
+            return ACTION_ENUM.GREATER_THAN;
+        }
+
+        if(ch == '<'){
+            return ACTION_ENUM.LITTLE_THAN;
+        }
+
+        if(ch == '='){
+            return ACTION_ENUM.EQUALS;
+        }
+
+        if(ch == '{'){
+            return ACTION_ENUM.LEFT_BRACE;
+        }
+
+        if(ch == '}'){
+            return ACTION_ENUM.RIGHT_BRACE;
+        }
+
+        if(Character.isWhitespace(ch)){
+            return ACTION_ENUM.WHITE_SPACE;
+        }
+
+        throw new RuntimeException("unmatched char=" + ch);
     }
 }

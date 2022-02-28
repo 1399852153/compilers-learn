@@ -10,7 +10,7 @@ public enum ACTION_ENUM {
     EQUALS(6,"="),
     LEFT_BRACE(7,"{"),
     RIGHT_BRACE(8,"}"),
-    BLANK(9,"空白符(制表符、空格、换行)")
+    WHITE_SPACE(9,"空白符(制表符、空格、换行)")
     ;
 
     private final int code;
