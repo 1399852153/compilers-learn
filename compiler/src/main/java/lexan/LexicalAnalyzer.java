@@ -36,7 +36,7 @@ public class LexicalAnalyzer {
         };
 
     private char[] sourceCode;
-    private int currentIndex = 0;
+    private int currentIndex = -1;
 
     private int currentState = 0;
 
@@ -45,11 +45,10 @@ public class LexicalAnalyzer {
     }
 
     public static void main(String[] args) {
-        String sourceCode = "pu";
+        String sourceCode = "public static void main(String[] args) {int abc=131+(22 -3) /45;}";
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
-        ArrayUtil.print2DArray(LexicalAnalyzer.STATE_TABLE);
-//        List<String> tokenList = lexicalAnalyzer.parseToken();
-//        System.out.println(tokenList);
+        List<String> tokenList = lexicalAnalyzer.parseToken();
+        System.out.println(tokenList);
     }
 
     public List<String> parseToken(){
@@ -67,36 +66,40 @@ public class LexicalAnalyzer {
         StringBuilder tokenValue = new StringBuilder();
 
         while(canParseNext()){
-            char ch = getNextChar();
-            ACTION_ENUM action = getAction(ch);
+            char nextCh = getNextChar();
+            ACTION_ENUM nextAction = getAction(nextCh);
 
-            currentState = STATE_TABLE[action.getCode()][currentState];
-            if(currentState == ERROR){
+            int nextState = STATE_TABLE[nextAction.getCode()][currentState];
+            if(nextState == ERROR){
                 // todo 识别换行符，增加报错行数的信息
                 throw new RuntimeException("un expect char index=" + currentIndex);
             }
 
-            currentIndex++;
-
-            if(currentState == OTHER){
+            if(nextState == OTHER){
                 // 接收一个token后，当前状态机state重置
                 currentState = 0;
                 // todo 类型、关键字过滤
                 return tokenValue.toString();
+            }else{
+                currentIndex++;
+                tokenValue.append(nextCh);
+                currentState = nextState;
             }
-
-            tokenValue.append(ch);
         }
 
-        throw new RuntimeException("not in here");
+        return tokenValue.toString();
     }
 
     private boolean canParseNext(){
-        return currentIndex < sourceCode.length;
+        return currentIndex < (sourceCode.length-1);
+    }
+
+    private char getCurrentChar(){
+        return sourceCode[currentIndex];
     }
 
     private char getNextChar(){
-        return sourceCode[currentIndex];
+        return sourceCode[currentIndex+1];
     }
 
     private static ACTION_ENUM getAction(char ch) {
