@@ -5,11 +5,22 @@ public enum ACTION_ENUM {
     LETTER(1,"字母"),
     PLUS(2,"+"),
     MINUS(3,"-"),
-    GREATER_THAN(4,">"),
-    LITTLE_THAN(5,"<"),
+    MULTI(4,"*"),
+    DIVISION(5,"/"),
     EQUALS(6,"="),
-    LEFT_BRACE(7,"{"),
-    RIGHT_BRACE(8,"}"),
+    GREATER_THAN(7,">"),
+    LITTLE_THAN(8,"<"),
+    LEFT_BRACE(9,"{"),
+    RIGHT_BRACE(10,"}"),
+    LEFT_BRACKETS(11,"["),
+    RIGHT_BRACKETS(12,"]"),
+    LEFT_PARENTHESES(13,"("),
+    RIGHT_PARENTHESES(14,")"),
+    COMMA(15,","),
+    SEMICOLON(16,";"),
+    DOT(16,"."),
+
+
     WHITE_SPACE(9,"空白符(制表符、空格、换行)")
     ;
 
