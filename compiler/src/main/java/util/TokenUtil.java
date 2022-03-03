@@ -1,14 +1,16 @@
 package util;
 
+import lexan.Token;
+import lexan.enums.KeyWordEnum;
 import lexan.enums.TokenTypeEnum;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class TokenTypeUtil {
+public class TokenUtil {
 
     private static final Map<Integer, TokenTypeEnum> tokenTypeMap;
+    private static final Set<String> keywordsSet;
+
 
     static {
         tokenTypeMap = new HashMap<>();
@@ -21,7 +23,14 @@ public class TokenTypeUtil {
                     throw new RuntimeException("tokenType not unique tokenTypeEnum=" + tokenTypeEnum);
                 }
             });
+        }
 
+        keywordsSet = new HashSet<>();
+        for(KeyWordEnum keyWordEnum : KeyWordEnum.values()){
+            boolean notAlreadyExists = keywordsSet.add(keyWordEnum.getCode());
+            if (!notAlreadyExists) {
+                throw new RuntimeException("keywords define repeat" + keyWordEnum);
+            }
         }
     }
 
@@ -31,5 +40,9 @@ public class TokenTypeUtil {
             throw new RuntimeException("no matched tokenType state=" + state);
         }
         return tokenTypeEnum;
+    }
+
+    public static boolean isKeyword(String tokenValue){
+        return keywordsSet.contains(tokenValue);
     }
 }

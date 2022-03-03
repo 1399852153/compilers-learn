@@ -2,7 +2,7 @@ package lexan;
 
 import lexan.enums.ActionEnum;
 import lexan.enums.TokenTypeEnum;
-import util.TokenTypeUtil;
+import util.TokenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,6 @@ public class LexicalAnalyzer {
 
     private char[] sourceCode;
     private int currentIndex = -1;
-
     private int currentState = 0;
 
     public LexicalAnalyzer(String sourceCode) {
@@ -50,6 +49,7 @@ public class LexicalAnalyzer {
     public static void main(String[] args) {
         String sourceCode = "public static void main(String[] args)  \n" +
                 "{int abc=131+(22 -   3) \t  /45; abc++;}";
+        System.out.println(sourceCode);
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();
         System.out.println(tokenList);
@@ -82,11 +82,10 @@ public class LexicalAnalyzer {
             }
 
             if(nextState == OTHER){
-                TokenTypeEnum tokenTypeEnum = TokenTypeUtil.getByState(currentState);
+                TokenTypeEnum tokenTypeEnum = TokenUtil.getByState(currentState);
                 // 接收一个token后，当前状态机state重置
                 currentState = 0;
-                // todo 关键字过滤
-                return new Token(tokenTypeEnum,tokenValue.toString());
+                return buildToken(tokenTypeEnum,tokenValue.toString());
             }else{
                 currentIndex++;
                 tokenValue.append(nextCh);
@@ -94,8 +93,8 @@ public class LexicalAnalyzer {
             }
         }
 
-        TokenTypeEnum tokenTypeEnum = TokenTypeUtil.getByState(currentState);
-        return new Token(tokenTypeEnum,tokenValue.toString());
+        TokenTypeEnum tokenTypeEnum = TokenUtil.getByState(currentState);
+        return buildToken(tokenTypeEnum,tokenValue.toString());
     }
 
     private boolean canParseNext(){
@@ -108,6 +107,15 @@ public class LexicalAnalyzer {
 
     private char getNextChar(){
         return sourceCode[currentIndex+1];
+    }
+
+    private Token buildToken(TokenTypeEnum tokenTypeEnum,String tokenValue){
+        if(tokenTypeEnum == TokenTypeEnum.IDENTIFIER && TokenUtil.isKeyword(tokenValue)){
+            // 标识符类型，进一步判断是否是关键字
+            return new Token(TokenTypeEnum.KEY_WORD,tokenValue);
+        }else{
+            return new Token(tokenTypeEnum,tokenValue.toString());
+        }
     }
 
     private static ActionEnum getAction(char ch) {
