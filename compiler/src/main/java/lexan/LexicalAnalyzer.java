@@ -1,6 +1,8 @@
 package lexan;
 
-import util.ArrayUtil;
+import lexan.enums.ActionEnum;
+import lexan.enums.TokenTypeEnum;
+import util.TokenTypeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,16 +47,16 @@ public class LexicalAnalyzer {
     }
 
     public static void main(String[] args) {
-        String sourceCode = "public static void main(String[] args) {int abc=131+(22 -3) /45;}";
+        String sourceCode = "public static void main(String[] args) {int abc=131+(22 -3) /45; abc++;}";
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
-        List<String> tokenList = lexicalAnalyzer.parseToken();
+        List<Token> tokenList = lexicalAnalyzer.parseToken();
         System.out.println(tokenList);
     }
 
-    public List<String> parseToken(){
-        List<String> tokenList = new ArrayList<>();
+    public List<Token> parseToken(){
+        List<Token> tokenList = new ArrayList<>();
         while(canParseNext()){
-            String token = getToken();
+            Token token = getToken();
             System.out.println(token);
             tokenList.add(token);
         }
@@ -62,12 +64,12 @@ public class LexicalAnalyzer {
         return tokenList;
     }
 
-    public String getToken(){
+    public Token getToken(){
         StringBuilder tokenValue = new StringBuilder();
 
         while(canParseNext()){
             char nextCh = getNextChar();
-            ACTION_ENUM nextAction = getAction(nextCh);
+            ActionEnum nextAction = getAction(nextCh);
 
             int nextState = STATE_TABLE[nextAction.getCode()][currentState];
             if(nextState == ERROR){
@@ -76,10 +78,11 @@ public class LexicalAnalyzer {
             }
 
             if(nextState == OTHER){
+                TokenTypeEnum tokenTypeEnum = TokenTypeUtil.getByState(currentState);
                 // 接收一个token后，当前状态机state重置
                 currentState = 0;
-                // todo 类型、关键字过滤
-                return tokenValue.toString();
+                // todo 关键字过滤
+                return new Token(tokenTypeEnum,tokenValue.toString());
             }else{
                 currentIndex++;
                 tokenValue.append(nextCh);
@@ -87,7 +90,8 @@ public class LexicalAnalyzer {
             }
         }
 
-        return tokenValue.toString();
+        TokenTypeEnum tokenTypeEnum = TokenTypeUtil.getByState(currentState);
+        return new Token(tokenTypeEnum,tokenValue.toString());
     }
 
     private boolean canParseNext(){
@@ -102,41 +106,41 @@ public class LexicalAnalyzer {
         return sourceCode[currentIndex+1];
     }
 
-    private static ACTION_ENUM getAction(char ch) {
+    private static ActionEnum getAction(char ch) {
         if(Character.isDigit(ch)){
-            return ACTION_ENUM.DIGITAL;
+            return ActionEnum.DIGITAL;
         }
 
         if(Character.isLetter(ch)){
-            return ACTION_ENUM.LETTER;
+            return ActionEnum.LETTER;
         }
 
         if(Character.isWhitespace(ch)){
-            return ACTION_ENUM.WHITE_SPACE;
+            return ActionEnum.WHITE_SPACE;
         }
 
         switch (ch){
-            case '+': return ACTION_ENUM.PLUS;
-            case '-': return ACTION_ENUM.MINUS;
-            case '*': return ACTION_ENUM.MULTI;
-            case '/': return ACTION_ENUM.DIVISION;
-            case '=': return ACTION_ENUM.EQUALS;
+            case '+': return ActionEnum.PLUS;
+            case '-': return ActionEnum.MINUS;
+            case '*': return ActionEnum.MULTI;
+            case '/': return ActionEnum.DIVISION;
+            case '=': return ActionEnum.EQUALS;
 
-            case '>': return ACTION_ENUM.GREATER_THAN;
-            case '<': return ACTION_ENUM.LITTLE_THAN;
+            case '>': return ActionEnum.GREATER_THAN;
+            case '<': return ActionEnum.LITTLE_THAN;
 
-            case '{': return ACTION_ENUM.LEFT_BRACE;
-            case '}': return ACTION_ENUM.RIGHT_BRACE;
+            case '{': return ActionEnum.LEFT_BRACE;
+            case '}': return ActionEnum.RIGHT_BRACE;
 
-            case '[': return ACTION_ENUM.LEFT_BRACKETS;
-            case ']': return ACTION_ENUM.RIGHT_BRACKETS;
+            case '[': return ActionEnum.LEFT_BRACKETS;
+            case ']': return ActionEnum.RIGHT_BRACKETS;
 
-            case '(': return ACTION_ENUM.LEFT_PARENTHESES;
-            case ')': return ACTION_ENUM.RIGHT_PARENTHESES;
+            case '(': return ActionEnum.LEFT_PARENTHESES;
+            case ')': return ActionEnum.RIGHT_PARENTHESES;
 
-            case ',': return ACTION_ENUM.COMMA;
-            case ';': return ACTION_ENUM.SEMICOLON;
-            case '.': return ACTION_ENUM.DOT;
+            case ',': return ActionEnum.COMMA;
+            case ';': return ActionEnum.SEMICOLON;
+            case '.': return ActionEnum.DOT;
 
             default:
                 throw new RuntimeException("unmatched char=" + ch);

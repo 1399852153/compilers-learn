@@ -1,6 +1,6 @@
-package lexan;
+package lexan.enums;
 
-public enum ACTION_ENUM {
+public enum ActionEnum {
     DIGITAL(0,"数字"),
     LETTER(1,"字母"),
     PLUS(2,"+"),
@@ -27,7 +27,7 @@ public enum ACTION_ENUM {
     private final int code;
     private final String message;
 
-    ACTION_ENUM(int code, String message) {
+    ActionEnum(int code, String message) {
         this.code = code;
         this.message = message;
     }
