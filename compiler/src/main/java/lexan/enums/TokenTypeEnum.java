@@ -29,6 +29,7 @@ public enum TokenTypeEnum {
     COMMA(",",Arrays.asList(22)),
     SEMICOLON(";",Arrays.asList(23)),
     DOT(".",Arrays.asList(24)),
+    WHITE_SPACE("空白符",Arrays.asList(25)),
     ;
 
 

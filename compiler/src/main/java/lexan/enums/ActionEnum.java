@@ -18,10 +18,8 @@ public enum ActionEnum {
     RIGHT_PARENTHESES(14,")"),
     COMMA(15,","),
     SEMICOLON(16,";"),
-    DOT(16,"."),
-
-
-    WHITE_SPACE(9,"空白符(制表符、空格、换行)")
+    DOT(17,"."),
+    WHITE_SPACE(18,"空白符(制表符、空格、换行)")
     ;
 
     private final int code;

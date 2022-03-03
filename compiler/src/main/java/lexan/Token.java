@@ -28,6 +28,10 @@ public class Token {
         this.value = value;
     }
 
+    public boolean isWhiteSpaceToken(){
+        return this.tokenTypeEnum == TokenTypeEnum.WHITE_SPACE;
+    }
+
     @Override
     public String toString() {
         return "Token{" +
