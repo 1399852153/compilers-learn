@@ -49,6 +49,7 @@ public class LexicalAnalyzer {
     public static void main(String[] args) {
         String sourceCode = "public static void main(String[] args)  \n" +
                 "{int abc=131+(22 -   3) \t  /45; abc++;}";
+
         System.out.println(sourceCode);
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();

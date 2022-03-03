@@ -1,6 +1,5 @@
 package util;
 
-import lexan.Token;
 import lexan.enums.KeyWordEnum;
 import lexan.enums.TokenTypeEnum;
 

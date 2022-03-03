@@ -20,6 +20,10 @@ public enum KeyWordEnum {
     ELSE("else"),
     SWITCH("switch"),
     CASE("case"),
+    NULL("null"),
+    NEW("new"),
+    CLASS("class"),
+
     ;
 
 
