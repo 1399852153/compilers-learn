@@ -107,7 +107,7 @@ public class LexicalAnalyzer {
             // 标识符类型，进一步判断是否是关键字
             return new Token(TokenTypeEnum.KEY_WORD,tokenValue);
         }else{
-            return new Token(tokenTypeEnum,tokenValue.toString());
+            return new Token(tokenTypeEnum,tokenValue);
         }
     }
 

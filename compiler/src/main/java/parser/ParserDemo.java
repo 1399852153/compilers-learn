@@ -2,7 +2,7 @@ package parser;
 
 import lexan.LexicalAnalyzer;
 import lexan.model.Token;
-import simple.ASTNode;
+import parser.model.ASTNode;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class ParserDemo {
         List<Token> tokenList = lexicalAnalyzer.parseToken();
 
         Parser parser = new Parser();
-        ASTNode ASTTreeRoot = parser.parse(tokenList);
+        ASTNode ASTTreeRoot = parser.parse(new TokenReader(tokenList));
     }
 
 }

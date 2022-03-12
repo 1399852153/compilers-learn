@@ -1,6 +1,6 @@
 package util;
 
-import lexan.enums.KeyWordEnum;
+import lexan.enums.KeywordEnum;
 import lexan.enums.TokenTypeEnum;
 
 import java.util.*;
@@ -25,7 +25,7 @@ public class TokenUtil {
         }
 
         keywordsSet = new HashSet<>();
-        for(KeyWordEnum keyWordEnum : KeyWordEnum.values()){
+        for(KeywordEnum keyWordEnum : KeywordEnum.values()){
             boolean notAlreadyExists = keywordsSet.add(keyWordEnum.getCode());
             if (!notAlreadyExists) {
                 throw new RuntimeException("keywords define repeat" + keyWordEnum);
