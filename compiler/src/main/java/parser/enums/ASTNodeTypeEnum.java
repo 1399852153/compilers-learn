@@ -1,9 +1,10 @@
 package parser.enums;
 
-public enum ASTNodeType {
+public enum ASTNodeTypeEnum {
 
     Programm,           //程序入口，根节点
 
+    Block,
     IntDeclaration,     //整型变量声明
     AssignmentStmt,     //赋值语句
 

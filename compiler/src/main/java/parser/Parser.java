@@ -3,6 +3,7 @@ package parser;
 
 import lexan.enums.TokenTypeEnum;
 import lexan.model.Token;
+import parser.enums.ASTNodeTypeEnum;
 import parser.model.ASTNode;
 import parser.util.ParserUtil;
 
@@ -24,15 +25,19 @@ public class Parser {
     }
 
     private void blockStatement(){
+        ASTNode blockASTNode = new ASTNode(ASTNodeTypeEnum.Block,"block");
         Token nextToken = tokenReader.peekToken();
         if(nextToken.getTokenTypeEnum() == TokenTypeEnum.LEFT_BRACE){
-            expressionStatement();
+            tokenReader.readToken();
+            expressionStatementList();
         }else{
             throw new RuntimeException("blockStatement parse error: not start with {");
         }
+
+
     }
 
-    private void expressionStatement(){
+    private ASTNode expressionStatementList(){
         Token nextToken = tokenReader.peekToken();
 
         if(ParserUtil.isKeywordTypeDefineToken(nextToken)){
@@ -40,5 +45,7 @@ public class Parser {
 
 
         }
+
+        return null;
     }
 }
