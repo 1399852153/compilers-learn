@@ -6,7 +6,7 @@ import java.util.List;
 
 public enum TokenTypeEnum {
     KEY_WORD("关键字",new ArrayList<>()),
-    PURE_DIGITAL("纯数字", Arrays.asList(1)),
+    LITERAL("字面量", Arrays.asList(1)),
     IDENTIFIER("标识符", Arrays.asList(2,3)),
     PLUS("+",Arrays.asList(4)),
     DOUBLE_PLUS("++",Arrays.asList(5)),
