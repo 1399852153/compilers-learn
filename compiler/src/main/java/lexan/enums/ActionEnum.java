@@ -19,7 +19,9 @@ public enum ActionEnum {
     COMMA(15,","),
     SEMICOLON(16,";"),
     DOT(17,"."),
-    WHITE_SPACE(18,"空白符(制表符、空格、换行)")
+    WHITE_SPACE(18,"空白符(制表符、空格、换行)"),
+    UNDER_LINE(19,"_(下划线)")
+
     ;
 
     private final int code;
