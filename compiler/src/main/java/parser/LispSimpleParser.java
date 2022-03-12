@@ -34,6 +34,7 @@ public class LispSimpleParser {
     private ASTNode SExpression(){
         Token peekToken = tokenReader.peekToken();
         if(peekToken.getTokenTypeEnum() != TokenTypeEnum.LEFT_PARENTHESES){
+            // 最基本的S表达式：单独的primary
             return primary();
         }
 

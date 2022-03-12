@@ -22,6 +22,7 @@ public class ParserDemo {
 
         LispSimpleParser lispSimpleParser = new LispSimpleParser(new TokenReader(tokenList));
         ASTNode ASTTreeRoot = lispSimpleParser.parse();
+        ASTTreeRoot.printTree();
     }
 
 }
