@@ -9,13 +9,19 @@ import java.util.List;
 public class ParserDemo {
 
     public static void main(String[] args) {
-        String sourceCode = "{int a = 10; int b = 20; int c = a+b;}";
+//        String sourceCode = "1";
+//        String sourceCode = "(1)";
+
+//        String sourceCode = "(* 12 (+ 21 31))";
+
+        String sourceCode = "(* (* 12 312) (+ (* 21 53) (+ 31 56)))";
+
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();
 
-        Parser parser = new Parser(new TokenReader(tokenList));
-        ASTNode ASTTreeRoot = parser.parse();
+        LispSimpleParser lispSimpleParser = new LispSimpleParser(new TokenReader(tokenList));
+        ASTNode ASTTreeRoot = lispSimpleParser.parse();
     }
 
 }

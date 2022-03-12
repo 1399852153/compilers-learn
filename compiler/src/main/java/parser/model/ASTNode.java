@@ -12,6 +12,10 @@ public class ASTNode {
     private ASTNodeTypeEnum nodeType;
     private String text;
 
+    public ASTNode(ASTNodeTypeEnum nodeType) {
+        this.nodeType = nodeType;
+    }
+
     public ASTNode(ASTNodeTypeEnum nodeType, String text) {
         this.nodeType = nodeType;
         this.text = text;
@@ -30,7 +34,11 @@ public class ASTNode {
     }
 
     public void setChildren(List<ASTNode> children) {
+        // 建立双向关联
         this.children = children;
+        for(ASTNode child : children){
+            child.parent = this;
+        }
     }
 
     public ASTNodeTypeEnum getNodeType() {
