@@ -1,4 +1,4 @@
-package lexan;
+package lexan.model;
 
 import lexan.enums.TokenTypeEnum;
 
