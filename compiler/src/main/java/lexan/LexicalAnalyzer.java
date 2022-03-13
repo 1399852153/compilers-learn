@@ -53,7 +53,6 @@ public class LexicalAnalyzer {
         while(canParseNext()){
             Token token = getToken();
             if(!token.isWhiteSpaceToken()){
-                System.out.println(token);
                 tokenList.add(token);
             }
         }

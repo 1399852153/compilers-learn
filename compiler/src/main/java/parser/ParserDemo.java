@@ -14,9 +14,9 @@ public class ParserDemo {
 
 //        String sourceCode = "(* 12 (+ 21 31))";
 
-        String sourceCode = "(* (+ 1 2) (+ 3 4))";
+        String sourceCode = "(* (+ 1 2) (* 3 (+ 4 2)))";
 
-
+        System.out.println(sourceCode);
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();
 
