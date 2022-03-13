@@ -14,7 +14,7 @@ public class ParserDemo {
 
 //        String sourceCode = "(* 12 (+ 21 31))";
 
-        String sourceCode = "(* (* 12 312) (+ (* 21 53) (+ 31 56)))";
+        String sourceCode = "(* (+ 1 2) (+ 3 4))";
 
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
@@ -23,6 +23,10 @@ public class ParserDemo {
         LispSimpleParser lispSimpleParser = new LispSimpleParser(new TokenReader(tokenList));
         ASTNode ASTTreeRoot = lispSimpleParser.parse();
         ASTTreeRoot.printTree();
+
+        LispSimpleInterpreter lispSimpleInterpreter = new LispSimpleInterpreter(ASTTreeRoot);
+        Object result = lispSimpleInterpreter.interpret();
+        System.out.println(result);
     }
 
 }
