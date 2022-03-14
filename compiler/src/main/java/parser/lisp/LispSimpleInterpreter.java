@@ -1,4 +1,4 @@
-package parser;
+package parser.lisp;
 
 import parser.enums.ASTNodeTypeEnum;
 import parser.model.ASTNode;

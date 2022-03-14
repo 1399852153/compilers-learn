@@ -10,7 +10,7 @@ public class JAVAASTDemo {
         // Parse the code you want to inspect:
         CompilationUnit cu = StaticJavaParser.parse("class X { " +
                 "public static void main(String[] args) {" +
-                "int a = 10; int b = 20; int c = a+b;" +
+                "int a = aa; int b = 20; int c = a+b;" +
                 "}" +
                 "}");
         // Now comes the inspection code:

@@ -1,12 +1,13 @@
-package parser;
+package parser.lisp;
 
 import lexan.LexicalAnalyzer;
 import lexan.model.Token;
+import parser.TokenReader;
 import parser.model.ASTNode;
 
 import java.util.List;
 
-public class ParserDemo {
+public class LispParserDemo {
 
     public static void main(String[] args) {
 //        String sourceCode = "1";
