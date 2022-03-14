@@ -49,15 +49,18 @@ public class LispSimpleParser {
             ASTNode calculateOpNode = calculateOp();
             ASTNode exp1Node = SExpression();
             ASTNode exp2Node = SExpression();
-            currentExpNode.setChildren(Arrays.asList(calculateOpNode,exp1Node,exp2Node));
+            currentExpNode
+                    .appendChildren(calculateOpNode)
+                    .appendChildren(exp1Node)
+                    .appendChildren(exp2Node);
         }else if(ParserUtil.isPrimary(token)){
             // -> (primary)
             ASTNode primaryNode = primary();
-            currentExpNode.setChildren(Collections.singletonList(primaryNode));
+            currentExpNode.appendChildren(primaryNode);
         }else{
             // -> (exp)
             ASTNode expNode = SExpression();
-            expNode.setChildren(Collections.singletonList(expNode));
+            expNode.appendChildren(expNode);
         }
 
         // 右边括号匹配

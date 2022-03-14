@@ -4,12 +4,13 @@ package parser.model;
 import parser.enums.ASTNodeTypeEnum;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ASTNode {
 
     private ASTNode parent;
-    private List<ASTNode> children = new ArrayList<>();
+    private LinkedList<ASTNode> children = new LinkedList<>();
     private ASTNodeTypeEnum nodeType;
     private String text = "";
 
@@ -30,16 +31,15 @@ public class ASTNode {
         this.parent = parent;
     }
 
-    public List<ASTNode> getChildren() {
+    public LinkedList<ASTNode> getChildren() {
         return children;
     }
 
-    public void setChildren(List<ASTNode> children) {
+    public ASTNode appendChildren(ASTNode childNode){
         // 建立双向关联
-        this.children = children;
-        for(ASTNode child : children){
-            child.parent = this;
-        }
+        childNode.parent = this;
+        children.add(childNode);
+        return this;
     }
 
     public ASTNodeTypeEnum getNodeType() {
