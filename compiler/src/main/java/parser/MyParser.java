@@ -84,7 +84,7 @@ public class MyParser {
     }
 
     public static void main(String[] args) {
-        String sourceCode = "2*3+5";
+        String sourceCode = "2+3*5+3+5 A";
         System.out.println(sourceCode);
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();
@@ -95,13 +95,11 @@ public class MyParser {
     }
 
     public ASTNode additiveExpression(){
-        // 预读两个token
-        Token next1Token = tokenReader.peekToken();
-        Token next2Token = tokenReader.peekToken(1);
+        ASTNode mulNode = multiplicativeExpression();
 
-        if(next2Token.getTokenTypeEnum() == TokenTypeEnum.PLUS ||
-                next2Token.getTokenTypeEnum() == TokenTypeEnum.MINUS){
-            ASTNode mulNode = multiplicativeExpression();
+        Token nextToken = tokenReader.peekToken();
+        if(nextToken.getTokenTypeEnum() == TokenTypeEnum.PLUS ||
+                nextToken.getTokenTypeEnum() == TokenTypeEnum.MINUS){
             Token opToken = tokenReader.readToken();
             ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
             ASTNode addNode = additiveExpression();
@@ -109,21 +107,16 @@ public class MyParser {
             currentNode.appendChildren(mulNode).appendChildren(opNode).appendChildren(addNode);
             return currentNode;
         }else{
-            ASTNode mulNode = multiplicativeExpression();
-            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.ADDITIVE_EXPRESSION);
-            currentNode.appendChildren(mulNode);
-            return currentNode;
+            return mulNode;
         }
     }
 
     public ASTNode multiplicativeExpression(){
-        // 预读两个token
-        Token next1Token = tokenReader.peekToken();
-        Token next2Token = tokenReader.peekToken(1);
+        ASTNode primaryNode = primary();
 
-        if(next2Token.getTokenTypeEnum() == TokenTypeEnum.MULTI ||
-                next2Token.getTokenTypeEnum() == TokenTypeEnum.DIVISION){
-            ASTNode primaryNode = primary();
+        Token nextToken = tokenReader.peekToken();
+        if(nextToken.getTokenTypeEnum() == TokenTypeEnum.MULTI ||
+                nextToken.getTokenTypeEnum() == TokenTypeEnum.DIVISION){
             Token opToken = tokenReader.readToken();
             ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
             ASTNode mulNode = multiplicativeExpression();
@@ -131,7 +124,7 @@ public class MyParser {
             currentNode.appendChildren(primaryNode).appendChildren(opNode).appendChildren(mulNode);
             return currentNode;
         }else{
-            return primary();
+            return primaryNode;
         }
     }
 
