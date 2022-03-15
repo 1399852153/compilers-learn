@@ -21,6 +21,8 @@ public enum ASTNodeTypeEnum {
     BLOCK_STATEMENTS("块语句集合"),
     ASSIGNMENT("赋值语句"),
     ASSIGNMENT_OPERATOR("赋值操作符"),
+    ADDITIVE_EXPRESSION("加法表达式"),
+    MULTIPLICATIVE_EXPRESSION("乘法表达式"),
 
 
     PRIMARY("基础类型"),

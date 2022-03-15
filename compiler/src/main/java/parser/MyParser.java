@@ -1,10 +1,13 @@
 package parser;
 
+import lexan.LexicalAnalyzer;
 import lexan.enums.TokenTypeEnum;
 import lexan.model.Token;
 import parser.enums.ASTNodeTypeEnum;
 import parser.model.ASTNode;
 import parser.util.ParserUtil;
+
+import java.util.List;
 
 public class MyParser {
 
@@ -76,16 +79,60 @@ public class MyParser {
             return assignment();
         }else{
             // 	-> additiveExpression
-            return null;
+            return additiveExpression();
         }
     }
 
+    public static void main(String[] args) {
+        String sourceCode = "2*3+5";
+        System.out.println(sourceCode);
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
+        List<Token> tokenList = lexicalAnalyzer.parseToken();
+
+        MyParser myParser = new MyParser(new TokenReader(tokenList));
+        ASTNode ASTTreeRoot = myParser.additiveExpression();
+        ASTTreeRoot.printTree();
+    }
+
     public ASTNode additiveExpression(){
-        return null;
+        // 预读两个token
+        Token next1Token = tokenReader.peekToken();
+        Token next2Token = tokenReader.peekToken(1);
+
+        if(next2Token.getTokenTypeEnum() == TokenTypeEnum.PLUS ||
+                next2Token.getTokenTypeEnum() == TokenTypeEnum.MINUS){
+            ASTNode mulNode = multiplicativeExpression();
+            Token opToken = tokenReader.readToken();
+            ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
+            ASTNode addNode = additiveExpression();
+            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.ADDITIVE_EXPRESSION);
+            currentNode.appendChildren(mulNode).appendChildren(opNode).appendChildren(addNode);
+            return currentNode;
+        }else{
+            ASTNode mulNode = multiplicativeExpression();
+            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.ADDITIVE_EXPRESSION);
+            currentNode.appendChildren(mulNode);
+            return currentNode;
+        }
     }
 
     public ASTNode multiplicativeExpression(){
-        return null;
+        // 预读两个token
+        Token next1Token = tokenReader.peekToken();
+        Token next2Token = tokenReader.peekToken(1);
+
+        if(next2Token.getTokenTypeEnum() == TokenTypeEnum.MULTI ||
+                next2Token.getTokenTypeEnum() == TokenTypeEnum.DIVISION){
+            ASTNode primaryNode = primary();
+            Token opToken = tokenReader.readToken();
+            ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
+            ASTNode mulNode = multiplicativeExpression();
+            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.MULTIPLICATIVE_EXPRESSION);
+            currentNode.appendChildren(primaryNode).appendChildren(opNode).appendChildren(mulNode);
+            return currentNode;
+        }else{
+            return primary();
+        }
     }
 
     /**
