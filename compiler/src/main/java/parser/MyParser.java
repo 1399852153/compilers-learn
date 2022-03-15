@@ -1,13 +1,10 @@
 package parser;
 
-import com.sun.org.apache.regexp.internal.RE;
 import lexan.enums.TokenTypeEnum;
 import lexan.model.Token;
 import parser.enums.ASTNodeTypeEnum;
 import parser.model.ASTNode;
 import parser.util.ParserUtil;
-
-import java.util.Arrays;
 
 public class MyParser {
 
@@ -17,7 +14,9 @@ public class MyParser {
         this.tokenReader = tokenReader;
     }
 
-
+    public ASTNode parse(){
+        return block();
+    }
 
     /**
      * primary
@@ -48,10 +47,75 @@ public class MyParser {
     }
 
     /**
-     *
+     * expression
+     * -> assignmentExpression
+     * -> lambdaExpression(暂不支持)
      * */
     public ASTNode expression(){
-        return null;
+        Token token = tokenReader.peekToken();
+
+        // todo assignmentExpression
+        return assignmentExpression();
+        // throw new RuntimeException("expression 语法分析错误：" + token);
+    }
+
+    /**
+     * assignmentExpression
+     * 	-> conditionalExpression(暂不支持)
+     * 	-> assignment
+     * */
+    public ASTNode assignmentExpression(){
+        return assignment();
+    }
+
+    /**
+     * assignment
+     * 	-> leftHandSide assignmentOperator expression
+     * */
+    public ASTNode assignment(){
+        ASTNode leftHandSideNode = leftHandSide();
+        ASTNode assignmentOperatorNode = assignmentOperator();
+        ASTNode expressionNode = expression();
+
+        ASTNode assignmentNode = new ASTNode(ASTNodeTypeEnum.ASSIGNMENT);
+        assignmentNode.appendChildren(leftHandSideNode)
+                .appendChildren(assignmentOperatorNode)
+                .appendChildren(expressionNode);
+        return assignmentNode;
+    }
+
+    /**
+     * leftHandSide
+     * 	:	expressionName
+     * 	|	fieldAccess(暂不支持)
+     * 	|	arrayAccess(暂不支持)
+     * */
+    public ASTNode leftHandSide(){
+        return expressionName();
+    }
+
+    /**
+     * expressionName
+     * 	:	Identifier
+     * 	|	ambiguousName '.' Identifier(暂不支持)
+     * */
+    public ASTNode expressionName(){
+        Token token = tokenReader.readToken();
+
+        if(token.getTokenTypeEnum() == TokenTypeEnum.IDENTIFIER){
+            return new ASTNode(ASTNodeTypeEnum.Identifier,token.getValue());
+        }
+
+        throw new RuntimeException("expressionName match error: " + token);
+    }
+
+    public ASTNode assignmentOperator(){
+        Token token = tokenReader.readToken();
+        if(token.getTokenTypeEnum() == TokenTypeEnum.ASSIGNMENT){
+            return new ASTNode(ASTNodeTypeEnum.ASSIGNMENT_OPERATOR,token.getValue());
+        }
+
+        throw new RuntimeException("assignmentOperator match error: " + token);
     }
 
     /**
@@ -103,16 +167,23 @@ public class MyParser {
         }
 
         // -> statement
+        return statement();
 
-
-        return null;
     }
 
     /**
-     *
+     * statement
+     * -> SEMI(;)
      * */
     public ASTNode statement(){
-        return null;
+        Token token = tokenReader.peekToken();
+        if(token.getTokenTypeEnum() == TokenTypeEnum.SEMICOLON){
+            // ; 空语句
+            Token semicolonToken= matchSemicolon();
+            return new ASTNode(ASTNodeTypeEnum.EMPTY_STATEMENT,semicolonToken.getValue());
+        }
+
+        throw new RuntimeException("statement match error :" + token);
     }
 
     /**
@@ -120,7 +191,7 @@ public class MyParser {
      * -> INT
      * */
     public ASTNode primitiveType(){
-        Token token = tokenReader.peekToken();
+        Token token = tokenReader.readToken();
         if(ParserUtil.isKeywordTypeDefineToken(token)){
             return new ASTNode(ASTNodeTypeEnum.PRIMARY_TYPE,token.getValue());
         }
@@ -195,7 +266,7 @@ public class MyParser {
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() == TokenTypeEnum.IDENTIFIER){
             // Identifier
-            return new ASTNode(ASTNodeTypeEnum.Identifier,token.getValue());
+            return new ASTNode(ASTNodeTypeEnum.VARIABLE_DECLARATOR_ID,token.getValue());
         }
 
         throw new RuntimeException("variableDeclaratorId need IDENTIFIER 语法分析错误:" + token);
@@ -203,48 +274,55 @@ public class MyParser {
 
     // ===========================================单token解析=================================================
 
-    private void matchEqualsChar(){
+    private Token matchEqualsChar(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.ASSIGNMENT && token.getValue().equals("=")){
             throw new RuntimeException("语法分析错误 not match '=' :" + token);
         }
+        return token;
     }
 
-    private void matchLeftBrace(){
+    private Token matchLeftBrace(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.LEFT_BRACE){
             throw new RuntimeException("语法分析错误 not match '{' :" + token);
         }
+        return token;
     }
 
-    private void matchRightBrace(){
+    private Token matchRightBrace(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.RIGHT_BRACE){
             throw new RuntimeException("语法分析错误 not match '}' :" + token);
         }
+        return token;
     }
 
-    private void matchLeftParentheses(){
+    private Token matchLeftParentheses(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.LEFT_PARENTHESES){
             throw new RuntimeException("语法分析错误 not match '(' :" + token);
         }
+        return token;
     }
 
-    private void matchRightParentheses(){
+    private Token matchRightParentheses(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.RIGHT_PARENTHESES){
             throw new RuntimeException("语法分析错误 not match ')' :" + token);
         }
+        return token;
     }
 
     /**
      * 分号;
      * */
-    private void matchSemicolon(){
+    private Token matchSemicolon(){
         Token token = tokenReader.readToken();
         if(token.getTokenTypeEnum() != TokenTypeEnum.SEMICOLON){
             throw new RuntimeException("语法分析错误 not match ';' :" + token);
         }
+
+        return token;
     }
 }
