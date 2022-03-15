@@ -61,11 +61,31 @@ public class MyParser {
 
     /**
      * assignmentExpression
-     * 	-> conditionalExpression(暂不支持)
+     * 	-> additiveExpression(暂时只支持+ - * / 算数表达式)
      * 	-> assignment
      * */
     public ASTNode assignmentExpression(){
-        return assignment();
+        // 预读两个token
+        Token next1Token = tokenReader.peekToken();
+        Token next2Token = tokenReader.peekToken(1);
+
+        // 预读两个token
+        if(next1Token.getTokenTypeEnum() == TokenTypeEnum.IDENTIFIER
+            && next2Token.getTokenTypeEnum() == TokenTypeEnum.ASSIGNMENT){
+            // -> assignment( ID = EXP)
+            return assignment();
+        }else{
+            // 	-> additiveExpression
+            return null;
+        }
+    }
+
+    public ASTNode additiveExpression(){
+        return null;
+    }
+
+    public ASTNode multiplicativeExpression(){
+        return null;
     }
 
     /**

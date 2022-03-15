@@ -18,6 +18,11 @@ public class TokenReader {
         return tokenList.get(currentIndex);
     }
 
+    public Token peekToken(int index){
+        // 预读，下标不变
+        return tokenList.get(currentIndex+index);
+    }
+
     public boolean canRead(){
         return currentIndex < tokenList.size()-1;
     }
