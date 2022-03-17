@@ -12,9 +12,11 @@ import java.util.List;
 public class MyParser {
 
     private TokenReader tokenReader;
+    private MyParserMatchOneToken myParserMatchOneToken;
 
     public MyParser(TokenReader tokenReader) {
         this.tokenReader = tokenReader;
+        this.myParserMatchOneToken = new MyParserMatchOneToken(tokenReader);
     }
 
     public ASTNode parse(){
@@ -42,7 +44,7 @@ public class MyParser {
         if(token.getTokenTypeEnum() == TokenTypeEnum.LEFT_PARENTHESES){
             // '( expression )'
             ASTNode expressionNode = expression();
-            matchRightParentheses();
+            this.myParserMatchOneToken.matchRightParentheses();
             return expressionNode;
         }
 
@@ -84,7 +86,7 @@ public class MyParser {
     }
 
     public static void main(String[] args) {
-        String sourceCode = "2+3*5+3+5 A";
+        String sourceCode = "2*3*5*7*9*10 A";
         System.out.println(sourceCode);
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
         List<Token> tokenList = lexicalAnalyzer.parseToken();
@@ -95,37 +97,49 @@ public class MyParser {
     }
 
     public ASTNode additiveExpression(){
-        ASTNode mulNode = multiplicativeExpression();
+        ASTNode op1Node = multiplicativeExpression();
 
-        Token nextToken = tokenReader.peekToken();
-        if(nextToken.getTokenTypeEnum() == TokenTypeEnum.PLUS ||
+        // 基于加法运算的左结合性，靠右的节点需要更加靠近树根，更加上层，才能保证下层靠左的节点先求值
+        ASTNode upNode = op1Node;
+        while(true){
+            Token nextToken = tokenReader.peekToken();
+            if(nextToken.getTokenTypeEnum() == TokenTypeEnum.PLUS ||
                 nextToken.getTokenTypeEnum() == TokenTypeEnum.MINUS){
-            Token opToken = tokenReader.readToken();
-            ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
-            ASTNode addNode = additiveExpression();
-            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.ADDITIVE_EXPRESSION);
-            currentNode.appendChildren(mulNode).appendChildren(opNode).appendChildren(addNode);
-            return currentNode;
-        }else{
-            return mulNode;
+                Token opToken = tokenReader.readToken();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
+                ASTNode op2Node = multiplicativeExpression();
+                ASTNode addNode = new ASTNode(ASTNodeTypeEnum.ADDITIVE_EXPRESSION)
+                    .appendChildren(upNode).appendChildren(opNode).appendChildren(op2Node);
+                upNode = addNode;
+            }else{
+                break;
+            }
         }
+
+        return upNode;
     }
 
     public ASTNode multiplicativeExpression(){
-        ASTNode primaryNode = primary();
+        ASTNode op1Node = primary();
 
-        Token nextToken = tokenReader.peekToken();
-        if(nextToken.getTokenTypeEnum() == TokenTypeEnum.MULTI ||
+        // 基于乘法运算的左结合性，靠右的节点需要更加靠近树根，更加上层，才能保证下层靠左的节点先求值
+        ASTNode upNode = op1Node;
+        while(true){
+            Token nextToken = tokenReader.peekToken();
+            if(nextToken.getTokenTypeEnum() == TokenTypeEnum.MULTI ||
                 nextToken.getTokenTypeEnum() == TokenTypeEnum.DIVISION){
-            Token opToken = tokenReader.readToken();
-            ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
-            ASTNode mulNode = multiplicativeExpression();
-            ASTNode currentNode = new ASTNode(ASTNodeTypeEnum.MULTIPLICATIVE_EXPRESSION);
-            currentNode.appendChildren(primaryNode).appendChildren(opNode).appendChildren(mulNode);
-            return currentNode;
-        }else{
-            return primaryNode;
+                Token opToken = tokenReader.readToken();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,opToken.getValue());
+                ASTNode op2Node = primary();
+                ASTNode addNode = new ASTNode(ASTNodeTypeEnum.MULTIPLICATIVE_EXPRESSION)
+                    .appendChildren(upNode).appendChildren(opNode).appendChildren(op2Node);
+                upNode = addNode;
+            }else{
+                break;
+            }
         }
+
+        return upNode;
     }
 
     /**
@@ -184,9 +198,9 @@ public class MyParser {
      * */
     public ASTNode block(){
         // -> '{' blockStatements '}'
-        matchLeftBrace();
+        this.myParserMatchOneToken.matchLeftBrace();
         ASTNode blockStatementsNode = blockStatements();
-        matchRightBrace();
+        this.myParserMatchOneToken.matchRightBrace();
 
         return blockStatementsNode;
     }
@@ -221,7 +235,7 @@ public class MyParser {
         if(ParserUtil.isKeywordTypeDefineToken(token)){
             // -> variableDeclarators ';'
             ASTNode variableDeclaratorsNode = variableDeclarators();
-            matchSemicolon();
+            this.myParserMatchOneToken.matchSemicolon();
 
             return variableDeclaratorsNode;
         }
@@ -239,7 +253,7 @@ public class MyParser {
         Token token = tokenReader.peekToken();
         if(token.getTokenTypeEnum() == TokenTypeEnum.SEMICOLON){
             // ; 空语句
-            Token semicolonToken= matchSemicolon();
+            Token semicolonToken= this.myParserMatchOneToken.matchSemicolon();
             return new ASTNode(ASTNodeTypeEnum.EMPTY_STATEMENT,semicolonToken.getValue());
         }
 
@@ -298,7 +312,7 @@ public class MyParser {
      * */
     public ASTNode variableDeclarator(){
         ASTNode variableDeclaratorIdNode = variableDeclaratorId();
-        matchEqualsChar();
+        this.myParserMatchOneToken.matchEqualsChar();
         ASTNode variableInitializerNode = variableInitializer();
 
         // -> variableDeclaratorId ('=' variableInitializer)
@@ -330,59 +344,5 @@ public class MyParser {
         }
 
         throw new RuntimeException("variableDeclaratorId need IDENTIFIER 语法分析错误:" + token);
-    }
-
-    // ===========================================单token解析=================================================
-
-    private Token matchEqualsChar(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.ASSIGNMENT && token.getValue().equals("=")){
-            throw new RuntimeException("语法分析错误 not match '=' :" + token);
-        }
-        return token;
-    }
-
-    private Token matchLeftBrace(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.LEFT_BRACE){
-            throw new RuntimeException("语法分析错误 not match '{' :" + token);
-        }
-        return token;
-    }
-
-    private Token matchRightBrace(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.RIGHT_BRACE){
-            throw new RuntimeException("语法分析错误 not match '}' :" + token);
-        }
-        return token;
-    }
-
-    private Token matchLeftParentheses(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.LEFT_PARENTHESES){
-            throw new RuntimeException("语法分析错误 not match '(' :" + token);
-        }
-        return token;
-    }
-
-    private Token matchRightParentheses(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.RIGHT_PARENTHESES){
-            throw new RuntimeException("语法分析错误 not match ')' :" + token);
-        }
-        return token;
-    }
-
-    /**
-     * 分号;
-     * */
-    private Token matchSemicolon(){
-        Token token = tokenReader.readToken();
-        if(token.getTokenTypeEnum() != TokenTypeEnum.SEMICOLON){
-            throw new RuntimeException("语法分析错误 not match ';' :" + token);
-        }
-
-        return token;
     }
 }

@@ -8,8 +8,6 @@ public enum ASTNodeTypeEnum {
     IntDeclaration("整型变量声明"),
     AssignmentStmt("赋值语句"),
 
-    Multiplicative("乘法表达式"),
-    Additive("加法表达式"),
 
     EMPTY_STATEMENT("空语句"),
     Identifier("标识符"),
