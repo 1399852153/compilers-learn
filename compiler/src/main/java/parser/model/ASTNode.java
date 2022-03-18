@@ -71,4 +71,12 @@ public class ASTNode {
             printTree(child, indent + "\t");
         }
     }
+
+    @Override
+    public String toString() {
+        return "ASTNode{" +
+            "nodeType=" + nodeType +
+            ", text='" + text + '\'' +
+            '}';
+    }
 }

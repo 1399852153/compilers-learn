@@ -29,7 +29,9 @@ public enum BinaryOpEnum {
         Map<TokenTypeEnum,BinaryOpEnum> map = new HashMap<>();
         for(BinaryOpEnum opEnum : values()){
             BinaryOpEnum oldValue = map.put(opEnum.tokenTypeEnum,opEnum);
-            throw new RuntimeException("repeat define opEnum=" + opEnum);
+            if(oldValue != null) {
+                throw new RuntimeException("repeat define opEnum=" + opEnum);
+            }
         }
         return map;
     }
