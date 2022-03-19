@@ -38,7 +38,7 @@ public class MyParser {
 
         if(token.getTokenTypeEnum() == TokenTypeEnum.LITERAL){
             // -> LITERAL（目前只支持整型字面量）
-            return new ASTNode(ASTNodeTypeEnum.IntLiteral,token.getValue());
+            return new ASTNode(ASTNodeTypeEnum.INT_LITERAL,token.getValue());
         }
 
         if(token.getTokenTypeEnum() == TokenTypeEnum.LEFT_PARENTHESES){

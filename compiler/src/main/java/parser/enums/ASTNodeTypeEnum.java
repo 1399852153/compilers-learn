@@ -11,7 +11,7 @@ public enum ASTNodeTypeEnum {
 
     EMPTY_STATEMENT("空语句"),
     Identifier("标识符"),
-    IntLiteral("整型字面量"),
+    INT_LITERAL("整型字面量"),
     PRIMARY_TYPE("基础类型"),
     VARIABLE_DECLARATOR_ID("变量定义(变量名)"),
     VARIABLE_DECLARATOR("变量定义"),

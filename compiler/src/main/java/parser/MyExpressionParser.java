@@ -26,17 +26,6 @@ public class MyExpressionParser {
         this.myParser = new MyParser(tokenReader);
     }
 
-    public static void main(String[] args) {
-        String sourceCode = "6+1*2+3*4+5 T";
-        System.out.println(sourceCode);
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
-        List<Token> tokenList = lexicalAnalyzer.parseToken();
-
-        MyExpressionParser myParser = new MyExpressionParser(new TokenReader(tokenList));
-        ASTNode treeNode = myParser.parseExpression();
-        treeNode.printTree();
-    }
-
     public ASTNode parseExpression(){
         Stack<ASTNode> opNumStack = new Stack<>();
         Stack<BinaryOpEnum> binaryOpStack = new Stack<>();
