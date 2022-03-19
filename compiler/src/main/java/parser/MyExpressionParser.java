@@ -119,18 +119,37 @@ public class MyExpressionParser {
     private ASTNode mergeRemainingNode(Stack<ASTNode> opNumStack,Stack<BinaryOpEnum> binaryOpStack){
         if(binaryOpStack.isEmpty()){
             // 特殊情况，操作符栈一进来就是空的，则操作数栈必须只存在一个opNumNode，此时直接弹出返回即可（可能存在吗？）
-            return opNumStack.pop();
+            ASTNode fastReturn = opNumStack.pop();
+            if(!opNumStack.isEmpty()){
+                throw new RuntimeException("opNumStack must empty！！！");
+            }
+            return fastReturn;
         }
 
-        ASTNode opNum2 = opNumStack.pop();
-        ASTNode opNum1 = opNumStack.pop();
-        BinaryOpEnum topOp = binaryOpStack.pop();
-        ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,topOp.getTokenTypeEnum().getMessage());
-
-        ASTNode mergeNode = new ASTNode(topOp.getAstNodeTypeEnum());
-        mergeNode.appendChildren(opNum1)
-                    .appendChildren(opNode)
-                    .appendChildren(opNum2);
+        ASTNode mergeNode = null;
+        while(!binaryOpStack.isEmpty()){
+            if(mergeNode == null){
+                // 先出栈的属于二维表达式的右操作数
+                ASTNode opNum2 = opNumStack.pop();
+                // 后出栈的属于二维表达式的左操作数
+                ASTNode opNum1 = opNumStack.pop();
+                BinaryOpEnum topOp = binaryOpStack.pop();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,topOp.getTokenTypeEnum().getMessage());
+                mergeNode = new ASTNode(topOp.getAstNodeTypeEnum());
+                mergeNode.appendChildren(opNum1)
+                        .appendChildren(opNode)
+                        .appendChildren(opNum2);
+            }else{
+                ASTNode opNum1 = opNumStack.pop();
+                BinaryOpEnum topOp = binaryOpStack.pop();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.CALCULATE_OP,topOp.getTokenTypeEnum().getMessage());
+                ASTNode newMergeNode = new ASTNode(topOp.getAstNodeTypeEnum());
+                newMergeNode.appendChildren(opNum1)
+                        .appendChildren(opNode)
+                        .appendChildren(mergeNode);
+                mergeNode = newMergeNode;
+            }
+        }
 
         if(!opNumStack.isEmpty()){
             throw new RuntimeException("opNumStack must empty！！！");
