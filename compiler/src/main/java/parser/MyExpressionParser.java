@@ -34,7 +34,7 @@ public class MyExpressionParser {
         Stack<ASTNode> opNumStack = new Stack<>();
         Stack<BinaryOpEnum> binaryOpStack = new Stack<>();
 
-        ASTNode opNumNode = myParser.primary();
+        ASTNode opNumNode = parseUnaryExpression();
         opNumStack.push(opNumNode);
 
         while(true) {
@@ -51,7 +51,7 @@ public class MyExpressionParser {
                 // 当前二元符号优先级高于栈顶符号
                 // 将当前符号和下一个操作数都压入栈
                 binaryOpStack.push(currentBinaryOpEnum);
-                ASTNode opNumNode2 = myParser.primary();
+                ASTNode opNumNode2 = parseUnaryExpression();
                 opNumStack.push(opNumNode2);
             }else{
                 do{
@@ -62,7 +62,7 @@ public class MyExpressionParser {
                 }while(!comparePriorityLevel(binaryOpStack,currentBinaryOpEnum));
 
                 // 随后将当前低优先级的操作符压入操作符栈中,下一个操作数压入操作数栈中
-                ASTNode nextOpNum = myParser.primary();
+                ASTNode nextOpNum = parseUnaryExpression();
                 opNumStack.push(nextOpNum);
                 binaryOpStack.push(currentBinaryOpEnum);
             }
@@ -159,23 +159,6 @@ public class MyExpressionParser {
             throw new RuntimeException("opNumStack must empty！！！");
         }
         return mergeNode;
-    }
-
-
-    public static void main(String[] args) {
-        // 注意：由于只支持整型，表达式内如果无法整除会有问题
-        String sourceCode = "-++a T";
-        System.out.println(sourceCode);
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
-        List<Token> tokenList = lexicalAnalyzer.parseToken();
-
-        MyExpressionParser myParser = new MyExpressionParser(new TokenReader(tokenList));
-        ASTNode treeNode = myParser.parseUnaryExpression();
-        treeNode.printTree();
-
-        int a=2;
-        int b=-++a;
-        System.out.println(b);
     }
 
     /**
