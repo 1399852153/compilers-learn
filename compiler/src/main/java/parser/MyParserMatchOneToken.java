@@ -69,4 +69,52 @@ public class MyParserMatchOneToken {
 
         return token;
     }
+
+    /**
+     * 加号
+     * */
+    public Token matchPlus(){
+        Token token = tokenReader.readToken();
+        if(token.getTokenTypeEnum() != TokenTypeEnum.PLUS){
+            throw new RuntimeException("语法分析错误 not match '+' :" + token);
+        }
+
+        return token;
+    }
+
+    /**
+     * 减号
+     * */
+    public Token matchMinus(){
+        Token token = tokenReader.readToken();
+        if(token.getTokenTypeEnum() != TokenTypeEnum.MINUS){
+            throw new RuntimeException("语法分析错误 not match '-' :" + token);
+        }
+
+        return token;
+    }
+
+    /**
+     * 双加号
+     * */
+    public Token matchDoublePlus(){
+        Token token = tokenReader.readToken();
+        if(token.getTokenTypeEnum() != TokenTypeEnum.DOUBLE_PLUS){
+            throw new RuntimeException("语法分析错误 not match '++' :" + token);
+        }
+
+        return token;
+    }
+
+    /**
+     * 双减号
+     * */
+    public Token matchDoubleMinus(){
+        Token token = tokenReader.readToken();
+        if(token.getTokenTypeEnum() != TokenTypeEnum.DOUBLE_MINUS){
+            throw new RuntimeException("语法分析错误 not match '--' :" + token);
+        }
+
+        return token;
+    }
 }

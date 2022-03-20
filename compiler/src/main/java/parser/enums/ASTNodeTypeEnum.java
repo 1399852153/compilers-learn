@@ -21,11 +21,14 @@ public enum ASTNodeTypeEnum {
     ASSIGNMENT_OPERATOR("赋值操作符"),
     ADDITIVE_EXPRESSION("加法表达式"),
     MULTIPLICATIVE_EXPRESSION("乘法表达式"),
-
+    UNARY_EXPRESSION("一元表达式"),
+    UNARY_EXP_OP("一元表达式运算符符"),
+    POSTFIX_EXPRESSION("含前缀一元表达式"),
 
     PRIMARY("基础类型"),
     S_EXPRESSION(" S表达式"),
     CALCULATE_OP("算数操作符"),
+
     ;
 
     private String message;

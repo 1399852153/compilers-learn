@@ -1,12 +1,13 @@
 package parser;
 
-import com.sun.scenario.effect.Merge;
+import com.sun.org.apache.regexp.internal.RE;
 import lexan.LexicalAnalyzer;
 import lexan.enums.TokenTypeEnum;
 import lexan.model.Token;
 import parser.enums.ASTNodeTypeEnum;
 import parser.enums.BinaryOpEnum;
 import parser.model.ASTNode;
+import sun.dc.pr.PRError;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,10 @@ public class MyExpressionParser {
         this.myParser = new MyParser(tokenReader);
     }
 
-    public ASTNode parseExpression(){
+    /**
+     * 二元表达式解析（参考java的实现，LR(1)解析）
+     * */
+    public ASTNode parseBinaryExpression(){
         Stack<ASTNode> opNumStack = new Stack<>();
         Stack<BinaryOpEnum> binaryOpStack = new Stack<>();
 
@@ -53,7 +57,7 @@ public class MyExpressionParser {
                 do{
                     // 当前二元符号优先级低于栈顶符号
                     // 弹出当前栈顶头两个操作数，将其与操作符号共同组成一个mergeNode
-                    mergeNode(opNumStack, binaryOpStack, currentBinaryOpEnum);
+                    mergeBinaryExpNode(opNumStack, binaryOpStack, currentBinaryOpEnum);
                     // merge后，若当前操作符的优先级依然低于栈顶操作符，则再进行规约，循环往复
                 }while(!comparePriorityLevel(binaryOpStack,currentBinaryOpEnum));
 
@@ -69,7 +73,7 @@ public class MyExpressionParser {
      * 前二元符号优先级低于栈顶符号
      * 弹出当前栈顶头两个操作数，将其与操作符号共同组成一个mergeNode
      * */
-    private void mergeNode(Stack<ASTNode> opNumStack,Stack<BinaryOpEnum> binaryOpStack,BinaryOpEnum currentBinaryOpEnum){
+    private void mergeBinaryExpNode(Stack<ASTNode> opNumStack, Stack<BinaryOpEnum> binaryOpStack, BinaryOpEnum currentBinaryOpEnum){
         ASTNode opNumNode1 = opNumStack.pop();
         ASTNode opNumNode2 = opNumStack.pop();
         // 先弹出栈顶高优先级的操作符，用于生成mergeNode
@@ -155,5 +159,99 @@ public class MyExpressionParser {
             throw new RuntimeException("opNumStack must empty！！！");
         }
         return mergeNode;
+    }
+
+
+    public static void main(String[] args) {
+        // 注意：由于只支持整型，表达式内如果无法整除会有问题
+        String sourceCode = "-++a T";
+        System.out.println(sourceCode);
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceCode);
+        List<Token> tokenList = lexicalAnalyzer.parseToken();
+
+        MyExpressionParser myParser = new MyExpressionParser(new TokenReader(tokenList));
+        ASTNode treeNode = myParser.parseUnaryExpression();
+        treeNode.printTree();
+
+        int a=2;
+        int b=-++a;
+        System.out.println(b);
+    }
+
+    /**
+     * 一元表达式解析
+     * unaryExpression
+     * -> '++' unaryExpression
+     * -> '--' unaryExpression
+     * -> '+' unaryExpression
+     * -> '-' unaryExpression
+     * -> postfixExpression
+     * */
+    public ASTNode parseUnaryExpression(){
+        Token token = tokenReader.peekToken();
+        switch (token.getTokenTypeEnum()){
+            case DOUBLE_PLUS: {
+                // '++' unaryExpression(preIncrementExpression)
+                ASTNode pNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXPRESSION);
+                Token plusToken = myParserMatchOneToken.matchDoublePlus();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXP_OP, plusToken.getValue());
+                ASTNode unaryExpNode = parseUnaryExpression();
+                pNode.appendChildren(opNode).appendChildren(unaryExpNode);
+                return pNode;
+            }
+            case DOUBLE_MINUS: {
+                // '--' unaryExpression(preDecrementExpression)
+                ASTNode pNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXPRESSION);
+                Token plusToken = myParserMatchOneToken.matchDoubleMinus();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXP_OP, plusToken.getValue());
+                ASTNode unaryExpNode = parseUnaryExpression();
+                pNode.appendChildren(opNode).appendChildren(unaryExpNode);
+                return pNode;
+            }
+            case PLUS: {
+                // '+' unaryExpression
+                ASTNode pNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXPRESSION);
+                Token plusToken = myParserMatchOneToken.matchPlus();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXP_OP, plusToken.getValue());
+                ASTNode unaryExpNode = parseUnaryExpression();
+                pNode.appendChildren(opNode).appendChildren(unaryExpNode);
+                return pNode;
+            }
+            case MINUS: {
+                // '-' unaryExpression
+                ASTNode pNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXPRESSION);
+                Token plusToken = myParserMatchOneToken.matchMinus();
+                ASTNode opNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXP_OP, plusToken.getValue());
+                ASTNode unaryExpNode = parseUnaryExpression();
+                pNode.appendChildren(opNode).appendChildren(unaryExpNode);
+                return pNode;
+            }
+            case IDENTIFIER:
+            case LITERAL: {
+                return postfixExpression();
+            }
+            default:
+                throw new RuntimeException("parseUnaryExpression not match");
+        }
+    }
+
+    /**
+     * postfixExpression
+     * -> primary ('++' | '--')*
+     * */
+    private ASTNode postfixExpression(){
+        ASTNode primaryNode = myParser.primary();
+
+        ASTNode postfixExpNode = new ASTNode(ASTNodeTypeEnum.POSTFIX_EXPRESSION);
+        postfixExpNode.appendChildren(primaryNode);
+        // LL1预测（如果是’++‘或’--‘则获取，否则结束当前节点的解析）
+        while(tokenReader.peekToken().getTokenTypeEnum() == TokenTypeEnum.DOUBLE_PLUS ||
+                tokenReader.peekToken().getTokenTypeEnum() == TokenTypeEnum.DOUBLE_PLUS){
+            Token opToken = tokenReader.readToken();
+            ASTNode opNode = new ASTNode(ASTNodeTypeEnum.UNARY_EXP_OP, opToken.getValue());
+            postfixExpNode.appendChildren(opNode);
+        }
+
+        return postfixExpNode;
     }
 }

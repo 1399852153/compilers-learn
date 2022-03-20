@@ -16,7 +16,7 @@ public class MyParserDemo {
         List<Token> tokenList = lexicalAnalyzer.parseToken();
 
         MyExpressionParser myParser = new MyExpressionParser(new TokenReader(tokenList));
-        ASTNode treeNode = myParser.parseExpression();
+        ASTNode treeNode = myParser.parseBinaryExpression();
         treeNode.printTree();
 
         MyExpressionInterpreter myExpressionInterpreter = new MyExpressionInterpreter(treeNode);

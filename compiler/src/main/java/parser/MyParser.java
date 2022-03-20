@@ -57,9 +57,7 @@ public class MyParser {
      * -> lambdaExpression(暂不支持)
      * */
     public ASTNode expression(){
-        Token token = tokenReader.peekToken();
-
-        // todo assignmentExpression
+        // 只支持assignmentExpression
         return assignmentExpression();
         // throw new RuntimeException("expression 语法分析错误：" + token);
     }
