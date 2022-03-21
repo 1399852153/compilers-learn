@@ -1,15 +1,11 @@
 package parser;
 
-import com.sun.org.apache.regexp.internal.RE;
-import lexan.LexicalAnalyzer;
 import lexan.enums.TokenTypeEnum;
 import lexan.model.Token;
 import parser.enums.ASTNodeTypeEnum;
 import parser.enums.BinaryOpEnum;
 import parser.model.ASTNode;
-import sun.dc.pr.PRError;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
